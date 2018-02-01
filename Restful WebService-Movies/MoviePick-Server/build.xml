@@ -1,0 +1,64 @@
+<project name="qRT-PCR Project Builder" default="war">
+<!--
+Tasks to be done
+	1. clean
+	2. init
+	3. compile
+	4. copy
+	5. war
+	6. deploy
+        7. client
+ -->
+	<path id="classpath">
+	    <fileset dir="WebContent/WEB-INF/lib">
+	         <include name="**/*.jar"/>
+	    </fileset>
+	    <fileset dir="lib">
+	         <include name="**/*.jar"/>
+	    </fileset>
+	    <pathelement location="/opt/jboss/modules/system/layers/base/javax/servlet/api/main/jboss-servlet-api_3.1_spec-1.0.0.Final.jar"/>
+	    <pathelement location="/opt/jboss/modules/system/layers/base/javax/ws/rs/api/main/jboss-jaxrs-api_2.0_spec-1.0.0.Final.jar"/>
+	    <pathelement location="/opt/jboss/modules/system/layers/base/org/jboss/resteasy/resteasy-jaxrs/main/resteasy-jaxrs-3.0.19.Final.jar"/>
+	    <pathelement location="/opt/jboss/modules/system/layers/base/org/slf4j/main/slf4j-api-1.7.7.jbossorg-1.jar"/>
+	    <pathelement location="lib/gson-2.8.0.jar"/>
+	</path>
+
+	<target name="clean">
+		<echo>Cleaning the WebContent/WEB-INF/classes directory</echo>
+		<delete>
+		    <fileset dir="WebContent/WEB-INF/classes" includes="*.class"/>
+		</delete>
+	</target>
+
+	<target name="compile">
+		<echo>Compile the source files</echo>
+		<property name="myclasspath" refid="classpath"/>
+		<javac srcdir="src" destdir="WebContent/WEB-INF/classes">
+			<classpath refid="classpath"/>
+		</javac>
+	</target>	
+	
+	<target name="war" depends="compile">
+		<echo>Building the war file</echo>
+		<war destfile="cs8350_4_movies.war" webxml="WebContent/WEB-INF/web.xml">
+			<fileset dir="WebContent" excludes="*.svn, **/web.xml"/>
+		</war>
+	</target>
+
+	<target name="deploy" depends="war">
+		<echo>Deploying the war file</echo>
+		<copy overwrite="yes" file="cs8350_4_movies.war" todir="/opt/jboss/standalone/deployments"/>
+		<chmod file="/opt/jboss/standalone/deployments/cs8350_4_movies.war" perm="a+r"/>
+	</target>
+
+	<target name="client">
+		<echo>Compile the client code source</echo>
+		<property name="myclasspath" refid="classpath"/>
+		<javac srcdir="." destdir=".">
+		  	<include name="Client.java" />
+			<classpath refid="classpath"/>
+		</javac>
+	</target>	
+
+
+</project>
